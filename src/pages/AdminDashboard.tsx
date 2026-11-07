@@ -226,26 +226,26 @@ const AdminDashboard: React.FC = () => {
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Rebuild The Youth Foundation logo" className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
+            <img src={logo} alt="Rebuild The Youth Foundation logo" className="w-10 h-10 rounded-lg object-cover border border-gray-200 flex-shrink-0" />
             <div>
               <h1 className="text-gray-900 font-bold text-lg leading-none">Admin Dashboard</h1>
               <p className="text-gray-500 text-xs mt-1">Rebuild The Youth Foundation</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button onClick={refresh} className="px-4 py-2 rounded-lg bg-gray-100 text-gray-900 text-sm font-medium hover:bg-gray-200 transition-colors">Refresh</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={refresh} className="px-3 py-2 rounded-lg bg-gray-100 text-gray-900 text-sm font-medium hover:bg-gray-200 transition-colors">Refresh</button>
             <button onClick={tab === 'registrations' ? exportRegCsv : exportReadersCsv}
-              className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black transition-colors">Export CSV</button>
-            <button onClick={logout} className="px-4 py-2 rounded-lg text-red-600 text-sm font-medium hover:bg-red-50 transition-colors">Logout</button>
+              className="px-3 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black transition-colors">Export CSV</button>
+            <button onClick={logout} className="px-3 py-2 rounded-lg text-red-600 text-sm font-medium hover:bg-red-50 transition-colors">Logout</button>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8">
         {/* Stats */}
-        <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
             { label: 'Total Registrations', value: registrations.length,   color: GOLD },
             { label: 'Book Readers',         value: readers.length,          color: '#6B7280' },
@@ -263,7 +263,7 @@ const AdminDashboard: React.FC = () => {
         </section>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-5 bg-gray-100 rounded-xl p-1 w-fit">
+        <div className="flex flex-col sm:flex-row gap-1 mb-5 bg-gray-100 rounded-xl p-1 w-full sm:w-fit">
           {(['registrations', 'readers'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>
@@ -286,7 +286,7 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden">
               <GoldBar />
               <div className="overflow-x-auto">
-                <table className="w-full text-left" style={{ borderCollapse: 'collapse' }}>
+                <table className="w-full min-w-[600px] text-left" style={{ borderCollapse: 'collapse' }}>
                   <thead className="bg-gray-900 text-white text-xs">
                     <tr>{REG_COLS.map(h => <th key={h} className="px-5 py-3.5 font-semibold uppercase tracking-wider whitespace-nowrap">{h}</th>)}</tr>
                   </thead>
@@ -317,7 +317,7 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden">
               <div style={{ height: 3, background: '#059669' }} />
               <div className="overflow-x-auto">
-                <table className="w-full text-left" style={{ borderCollapse: 'collapse' }}>
+                <table className="w-full min-w-[600px] text-left" style={{ borderCollapse: 'collapse' }}>
                   <thead className="bg-gray-900 text-white text-xs">
                     <tr>{READER_COLS.map(h => <th key={h} className="px-5 py-3.5 font-semibold uppercase tracking-wider whitespace-nowrap">{h}</th>)}</tr>
                   </thead>

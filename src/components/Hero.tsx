@@ -91,7 +91,10 @@ export default function Hero() {
         overflowX: 'hidden',
         boxSizing: 'border-box',
         /* Reduced vertical padding so content + countdown sit above the fold */
-        paddingTop: '80px',
+        /* Mobile: extra top padding so card clears the fixed navbar + ticker.
+           112px = ~navbar (56px) + ticker (~28px) + 28px breathing room.
+           On wider screens we cap at 96px since the card is bigger anyway. */
+        paddingTop: 'max(112px, 8vw)',
         paddingBottom: '32px',
       }}
     >
