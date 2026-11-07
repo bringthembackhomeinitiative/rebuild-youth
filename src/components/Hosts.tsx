@@ -80,6 +80,12 @@ const Hosts: React.FC = () => (
                     src={host.photo}
                     alt={`Portrait of ${host.name}`}
                     className="w-full h-full object-cover object-top"
+                    loading="eager"
+                    decoding="sync"
+                    onError={e => {
+                      console.error('[Hosts] img failed:', (e.currentTarget as HTMLImageElement).src)
+                      e.currentTarget.style.display = 'none'
+                    }}
                   />
                 ) : (
                   <div
