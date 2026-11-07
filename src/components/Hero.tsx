@@ -84,17 +84,19 @@ export default function Hero() {
            keeps the countdown visible without scrolling on most screens.   */
         minHeight: '100svh',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
         /* FIX: clip the background image at viewport edges */
         overflow: 'hidden',
         overflowX: 'hidden',
         boxSizing: 'border-box',
-        /* Mobile: extra top padding so card clears the fixed navbar (64px) + ticker (44px) = 108px total.
-           Use 160px on mobile to give ~52px of breathing room below the ticker.
-           On desktop (≥768px) 8vw = ~96px but navbar+ticker is same, so we keep 160px floor. */
+        /* Mobile: navbar (64px) + ticker (44px) = 108px fixed overlay.
+           160px gives ~52px gap. alignItems: flex-start ensures paddingTop
+           is never overridden by flexbox centering. */
         paddingTop: 'max(160px, 8vw)',
-        paddingBottom: '32px',
+        paddingBottom: '48px',
+        /* TEMP: red border to confirm new code is live — remove after confirmation */
+        outline: '3px solid red',
       }}
     >
       {/* ── Background image ───────────────────────────────────────────── */}
