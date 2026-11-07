@@ -130,7 +130,7 @@ export const hosts: HostProfile[] = [
     name: 'Dr. Barnabas Adefemi',
     title: 'Co-Founder',
     initials: 'DA',
-    photo: '/images/hosts/dr-adefemi.jpg',
+    photo: '/images/hosts/dr-adefemi.jpg?v=7',
     bio: `Dr. Barnabas Adefemi is the Co-Founder and Chief Executive Officer of Rebuild the Youth Foundation (RTYF), a Senior Resident Doctor in Family Medicine, youth advocate and public health enthusiast.
 
 A recipient of a Presidential Honour and two Governor's Awards, he is also an Associate Pastor in a Bible-believing church. He has held several leadership positions within and outside the church and is passionate about community development, youth mentorship, character development and nation-building initiatives.`,
@@ -140,7 +140,7 @@ A recipient of a Presidential Honour and two Governor's Awards, he is also an As
     name: 'Mrs. Moyosola Adefemi',
     title: 'Co-Founder',
     initials: 'MA',
-    photo: '/images/hosts/mrs-adefemi.jpg',
+    photo: '/images/hosts/mrs-adefemi.jpg?v=7',
     bio: `Mrs. Moyosola Adefemi is the Co-Founder and Executive Director of Rebuild the Youth Foundation (RTYF), a public health enthusiast, counsellor, youth advocate and public speaker.
 
 She also serves as an Associate Coordinator in a Bible-believing church and has held various leadership positions. She is passionate about youth mentorship, character building and community development.`,
