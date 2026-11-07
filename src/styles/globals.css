@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DESIGN TOKENS — Rebuild Hangout 2026
+   Source: Official event flyer (royal blue + gold identity)
+   ============================================================ */
+:root {
+  --navy:        #071A5E;
+  --navy-mid:    #0B2A8C;
+  --royal:       #0D2FA3;
+  --cobalt:      #1848CC;
+  --cobalt-lt:   #1E56E0;
+  --gold:        #C8900A;
+  --gold-lt:     #D4A017;
+  --gold-pale:   #E8C36B;
+  --white:       #FFFFFF;
+  --off-white:   #F0EFEA;
+  --ink:         #0A0F2E;
+
+  --display: 'Playfair Display', Georgia, serif;
+  --body:    'Inter', system-ui, sans-serif;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;   /* FIX: prevent horizontal scroll from any overflowing child */
+}
+
+body {
+  font-family: var(--body);
+  background: #FFFFFF;
+  color: var(--off-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--cobalt); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--gold-pale);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ============================================================
+   TYPOGRAPHY HELPERS
+   ============================================================ */
+.font-display { font-family: var(--display); }
+
+/* Hero title — "Hangout" treatment */
+.hero-title-line {
+  display: block;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+/* Oversized section number */
+.section-numeral {
+  font-family: var(--display);
+  font-size: clamp(6rem, 18vw, 14rem);
+  font-weight: 900;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(200, 144, 10, 0.12);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ============================================================
+   CINEMATIC LIGHTING LAYERS
+   The flyer's distinctive: dramatic radial from upper-right,
+   secondary sweep from lower-left, gold warmth at base.
+   ============================================================ */
+.light-base {
+  background:
+    radial-gradient(ellipse 80% 70% at 70% 0%,   rgba(30, 86, 224, 0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 50% at 5%  85%,  rgba(200,144,10,  0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(7, 26, 94,   0.90) 0%, transparent 100%),
+    linear-gradient(180deg, #071A5E 0%, #0B2A8C 60%, #071A5E 100%);
+}
+
+.light-sweep-r {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 65% at 88% 8%,
+      rgba(255,255,255,0.07) 0%,
+      rgba(30,86,224,0.06)   35%,
+      transparent            70%);
+}
+
+.light-sweep-l {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 55% at 12% 92%,
+      rgba(200,144,10,0.08) 0%,
+      transparent            60%);
+}
+
+.light-center {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 50% at 50% 45%,
+    rgba(13,47,163,0.35) 0%, transparent 70%);
+}
+
+/* ============================================================
+   SECTION BACKGROUNDS — alternating rhythm
+   Dark variants: used for Hero, Event, Register, Footer
+   Light variants: used for About, Why, Impact, Founders
+   ============================================================ */
+.bg-section-a {
+  background:
+    radial-gradient(ellipse 70% 50% at 80% 20%, rgba(30,86,224,0.18) 0%, transparent 60%),
+    linear-gradient(175deg, #071A5E 0%, #0B2A8C 100%);
+}
+
+.bg-section-b {
+  background:
+    radial-gradient(ellipse 60% 60% at 20% 80%, rgba(30,86,224,0.12) 0%, transparent 55%),
+    linear-gradient(175deg, #0B2A8C 0%, #071A5E 100%);
+}
+
+.bg-section-c {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(13,47,163,0.4) 0%, transparent 55%),
+    #071A5E;
+}
+
+/* ── Light section variants ── */
+.bg-light-a {
+  background:
+    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(213,177,106,0.06) 0%, transparent 55%),
+    #F8F6F0;
+}
+
+.bg-light-b {
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(23,43,77,0.04) 0%, transparent 55%),
+    #FFFFFF;
+}
+
+.bg-light-c {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(213,177,106,0.08) 0%, transparent 55%),
+    #F8F6F0;
+}
+
+/* ============================================================
+   GOLD LINE ACCENTS
+   ============================================================ */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C8900A 30%, #E8C36B 50%, #C8900A 70%, transparent);
+  border: none;
+}
+
+.gold-line-v {
+  width: 1px;
+  background: linear-gradient(180deg, transparent, #C8900A 30%, #E8C36B 50%, #C8900A 70%, transparent);
+}
+
+/* Darker gold rule for use on light/ivory backgrounds */
+.gold-line-dark {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #B07A08 30%, #C8900A 50%, #B07A08 70%, transparent);
+  border: none;
+}
+
+/* ============================================================
+   GRAIN TEXTURE (very subtle — adds cinematic depth)
+   ============================================================ */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.028;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   TICKET
+   ============================================================ */
+.ticket-perf {
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px, transparent 5px,
+    rgba(255,255,255,0.12) 5px, rgba(255,255,255,0.12) 6px
+  );
+}
+
+.qr-wrap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 1.5px;
+  padding: 5px;
+  background: #fff;
+  border-radius: 3px;
+}
+.qr-cell { border-radius: 1px; }
+.qr-on  { background: #071A5E; }
+.qr-off { background: transparent; }
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+.text-balance { text-wrap: balance; }
+
+/* ============================================================
+   SCROLL PADDING — offset fixed navbar (white strip ~44px + nav ~64px = ~108px)
+   ============================================================ */
+html {
+  scroll-padding-top: 108px;
+}
+
+/* ============================================================
+   REDUCED MOTION — accessibility
+   Framer Motion reads this and skips animations automatically
+   when the CSS class `motion-reduce` is detected. We also
+   manually guard the Ken Burns keyframe here.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Stop Ken Burns scale entirely */
+  [data-ken-burns] {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================================
+   PRINT STYLES — ticket download via browser print-to-PDF
+   Only the #printable-ticket element is shown. Everything else
+   is hidden so the user gets a clean single-card PDF.
+   ============================================================ */
+@media print {
+  /* Hide everything */
+  body > * { display: none !important; }
+
+  /* Show only the root mount */
+  body > #root { display: block !important; }
+
+  /* Within the app, hide everything except the ticket card */
+  #root > * { display: none !important; }
+
+  /* Reveal just the printable ticket */
+  #printable-ticket {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 420px !important;
+    margin: auto !important;
+    box-shadow: none !important;
+    border: 1px solid #C8900A !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure parent containers are visible for the ticket to render */
+  #root,
+  main,
+  #ticket,
+  #ticket > *,
+  #ticket section,
+  .container {
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Keep ticket colours in print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide print hint text itself */
+  .print\:hidden { display: none !important; }
+}

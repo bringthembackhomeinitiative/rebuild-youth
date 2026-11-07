@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/((?!images|assets|books|rebuild-logo-watermark\\.avif).*)", "destination": "/index.html" }
+  ]
+}
