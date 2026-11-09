@@ -90,13 +90,10 @@ export default function Hero() {
         overflow: 'hidden',
         overflowX: 'hidden',
         boxSizing: 'border-box',
-        /* Mobile: navbar (64px) + ticker (44px) = 108px fixed overlay.
-           160px gives ~52px gap. alignItems: flex-start ensures paddingTop
-           is never overridden by flexbox centering. */
-        paddingTop: 'max(160px, 8vw)',
+        /* navbar (64px) + ticker (44px) = 108px of fixed overlay.
+           pt-[120px] on mobile, 140px on md+ gives clear gap on all screens. */
+        paddingTop: 'clamp(120px, 12vw, 140px)',
         paddingBottom: '48px',
-        /* TEMP: red border to confirm new code is live — remove after confirmation */
-        outline: '3px solid red',
       }}
     >
       {/* ── Background image ───────────────────────────────────────────── */}

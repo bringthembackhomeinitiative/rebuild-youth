@@ -10,11 +10,14 @@ import BookSection from './components/BookSection';
 import Hosts from './components/Hosts';
 import EventDetails from './components/EventDetails';
 import RegistrationForm from './components/RegistrationForm';
+import SupportMission from './components/SupportMission';
 import Footer from './components/Footer';
 import TicketPage from './pages/TicketPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Readbook from './pages/Readbook';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import type { AttendanceMode, TicketData } from './types';
 
 // ── Landing page ─────────────────────────────────────────────────────────────
@@ -52,6 +55,7 @@ function Landing() {
         initialMode={selectedMode}
         onTicketGenerated={handleTicketGenerated}
       />
+      <SupportMission />
       <Footer />
     </div>
   );
@@ -62,11 +66,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"             element={<Landing />}       />
-        <Route path="/ticket"       element={<TicketPage />}    />
-        <Route path="/admin/login"  element={<AdminLogin />}    />
-        <Route path="/admin"        element={<AdminDashboard />} />
-        <Route path="/read-book"    element={<Readbook />}      />
+        <Route path="/"                element={<Landing />}          />
+        <Route path="/ticket"          element={<TicketPage />}        />
+        <Route path="/admin/login"     element={<AdminLogin />}        />
+        <Route path="/admin"           element={<AdminDashboard />}    />
+        <Route path="/read-book"       element={<Readbook />}          />
+        <Route path="/forgot-password" element={<ForgotPassword />}    />
+        <Route path="/reset-password"  element={<ResetPassword />}     />
       </Routes>
     </BrowserRouter>
   );

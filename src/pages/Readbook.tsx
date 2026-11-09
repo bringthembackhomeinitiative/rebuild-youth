@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import logoUrl from '@/assets/logo.png'
 
@@ -677,6 +677,13 @@ export default function Readbook() {
             <button type="submit" disabled={loading} style={btnStyle(true, loading)}>
               {loading ? 'Logging in…' : 'Login & Read →'}
             </button>
+            {/* Forgot password link */}
+            <Link
+              to="/forgot-password"
+              style={{ textAlign: 'center', fontSize: '13px', color: '#8B4513', textDecoration: 'underline', padding: 0 }}
+            >
+              Forgot Password?
+            </Link>
             <button type="button" onClick={() => { setMode('register'); setFormErr('') }}
               style={{ background: 'none', border: 'none', color: '#8B4513', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
               Don't have an account? Register free
