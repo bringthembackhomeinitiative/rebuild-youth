@@ -2,7 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Container from './ui/Container'
 import { hosts } from '@/content/siteContent'
-import { fadeUp, staggerContainer, staggerChild, VIEWPORT_ONCE } from '@/lib/animations'
+import { fadeUp, VIEWPORT_ONCE } from '@/lib/animations'
 
 const Hosts: React.FC = () => (
   <section id="hosts" className="relative py-24 md:py-36 overflow-hidden bg-light-a">
@@ -22,7 +22,6 @@ const Hosts: React.FC = () => (
         viewport={VIEWPORT_ONCE}
         className="text-center mb-20"
       >
-        {/* Section label: gold bold */}
         <p
           className="font-body font-bold uppercase mb-5"
           style={{ fontSize: '0.7rem', letterSpacing: '0.3em', color: '#B07A08' }}
@@ -37,7 +36,6 @@ const Hosts: React.FC = () => (
           <span className="block sm:inline font-normal" style={{ color: 'rgba(23,43,77,0.4)' }}>&amp;</span>
           &nbsp;<span className="italic" style={{ color: '#B07A08' }}>Mrs. Moyosola Adefemi</span>
         </h2>
-        {/* Sub-description: dark ink, readable */}
         <p
           className="font-body mt-4 max-w-lg mx-auto leading-relaxed"
           style={{ fontSize: '16px', color: '#283444' }}
@@ -48,20 +46,18 @@ const Hosts: React.FC = () => (
         <div className="gold-line-dark w-16 mx-auto mt-6" aria-hidden="true" />
       </motion.div>
 
-      {/* ── Founder pair ── */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-12 max-w-4xl mx-auto"
-        variants={staggerContainer} initial="hidden" whileInView="visible"
-        viewport={VIEWPORT_ONCE}
-      >
+      {/* ── Founder pair ──
+          NO whileInView / stagger here — on mobile the IntersectionObserver
+          can fail to fire, leaving opacity:0 permanently (blank white circle).
+          Each card is always visible; only the text below uses a gentle fadeUp. */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-12 max-w-4xl mx-auto">
         {hosts.map((host) => (
-          <motion.article
+          <article
             key={host.id}
-            variants={staggerChild}
             aria-label={`Co-founder: ${host.name}`}
             className="flex flex-col items-center text-center"
           >
-            {/* ── Portrait frame ── */}
+            {/* ── Portrait frame — always visible, no animation wrapper ── */}
             <div
               className="relative mb-8 group"
               style={{ width: 200, height: 200 }}
@@ -82,6 +78,7 @@ const Hosts: React.FC = () => (
                     className="w-full h-full object-cover object-top"
                     loading="eager"
                     decoding="sync"
+                    style={{ opacity: 1, visibility: 'visible', display: 'block' }}
                     onError={e => {
                       console.error('[Hosts] img failed:', (e.currentTarget as HTMLImageElement).src)
                       e.currentTarget.style.display = 'none'
@@ -118,44 +115,44 @@ const Hosts: React.FC = () => (
               />
             </div>
 
-            {/* Name */}
-            <h3
-              className="font-display font-bold mb-1 text-balance"
-              style={{ fontSize: 'clamp(1.15rem, 2.8vw, 1.65rem)', color: '#172B4D' }}
+            {/* Name + role — safe to animate, text is always readable even if delayed */}
+            <motion.div
+              variants={fadeUp} initial="hidden" whileInView="visible"
+              viewport={VIEWPORT_ONCE}
             >
-              {host.name}
-            </h3>
-
-            {/* Role label: gold bold */}
-            <p
-              className="font-body font-bold mb-6"
-              style={{
-                fontSize: '0.62rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: '#B07A08',
-              }}
-            >
-              {host.title}
-            </p>
-
-            <div className="gold-line-dark w-10 mb-6 mx-auto" aria-hidden="true" />
-
-            {/* Bio: dark ink fully readable */}
-            <div className="space-y-4 text-left sm:text-center">
-              {host.bio.split('\n\n').map((para, i) => (
-                <p
-                  key={i}
-                  className="font-body leading-relaxed max-w-sm mx-auto"
-                  style={{ fontSize: '15px', color: '#283444' }}
-                >
-                  {para.trim()}
-                </p>
-              ))}
-            </div>
-          </motion.article>
+              <h3
+                className="font-display font-bold mb-1 text-balance"
+                style={{ fontSize: 'clamp(1.15rem, 2.8vw, 1.65rem)', color: '#172B4D' }}
+              >
+                {host.name}
+              </h3>
+              <p
+                className="font-body font-bold mb-6"
+                style={{
+                  fontSize: '0.62rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: '#B07A08',
+                }}
+              >
+                {host.title}
+              </p>
+              <div className="gold-line-dark w-10 mb-6 mx-auto" aria-hidden="true" />
+              <div className="space-y-4 text-left sm:text-center">
+                {host.bio.split('\n\n').map((para, i) => (
+                  <p
+                    key={i}
+                    className="font-body leading-relaxed max-w-sm mx-auto"
+                    style={{ fontSize: '15px', color: '#283444' }}
+                  >
+                    {para.trim()}
+                  </p>
+                ))}
+              </div>
+            </motion.div>
+          </article>
         ))}
-      </motion.div>
+      </div>
 
       {/* ── Consultation line ── */}
       <motion.p

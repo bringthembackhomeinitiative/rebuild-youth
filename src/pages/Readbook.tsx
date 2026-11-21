@@ -1,7 +1,7 @@
 /**
  * Readbook — Secure PDF reader with account system, reading timer, and logo watermark.
  *
- * PDF is served from /books/why-harm-your-body.pdf (public folder, original file, no compression).
+ * Books are configured in the BOOKS array (below) and served from /public/books/.
  * Rendering: PDF.js at devicePixelRatio × fitScale × userZoom so text stays crisp at 200% zoom.
  */
 
@@ -12,11 +12,25 @@ import logoUrl from '@/assets/logo.png'
 
 declare global { interface Window { pdfjsLib: any } }
 
-const PDF_URL      = '/books/why-harm-your-body.pdf'
 const PDFJS_CDN    = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
 const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
 const EMAIL_RE     = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const IDLE_TIMEOUT = 60_000
+
+// ── Available books ──────────────────────────────────────────────────────────
+// To add a book: drop its PDF into /public/books/ and add an entry here — the
+// dropdown updates automatically. The #hash hides the native PDF viewer chrome
+// (toolbar/navpanes/download) if a browser ever opens the file directly; the
+// browser strips the fragment before fetching, so PDF.js still loads fine.
+type Book = { id: string; title: string; author: string; url: string }
+const BOOKS: Book[] = [
+  {
+    id: 'why-harm-your-body',
+    title: 'Why Harm Your Body?',
+    author: 'Dr. Barnabas & Mrs. Moyosola Adefemi',
+    url: '/books/why-harm-your-body.pdf#toolbar=0&navpanes=0&download=0',
+  },
+]
 
 const ZOOM_STEPS       = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
 const ZOOM_DEFAULT_IDX = 2   // 1.0 = 100%
@@ -120,6 +134,40 @@ function ToolBtn({ onClick, disabled = false, title, children }: {
   )
 }
 
+// ── Book dropdown — never disabled; used in the toolbar and the error fallback ─
+function BookSelect({ value, onChange, id = 'book-select' }: {
+  value: string; onChange: (id: string) => void; id?: string
+}) {
+  return (
+    <select
+      id={id}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      aria-label="Select a book"
+      title="Select a book"
+      style={{
+        background: 'rgba(251,191,36,0.12)',
+        border: '1px solid rgba(251,191,36,0.45)',
+        borderRadius: '7px',
+        color: '#fbbf24',
+        fontSize: '12px',
+        fontWeight: 700,
+        padding: '6px 10px',
+        cursor: 'pointer',
+        maxWidth: '210px',
+        outline: 'none',
+        flexShrink: 0,
+      }}
+    >
+      {BOOKS.map(b => (
+        <option key={b.id} value={b.id} style={{ color: '#111', background: '#fff' }}>
+          {b.title}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Readbook() {
   const navigate = useNavigate()
@@ -151,6 +199,10 @@ export default function Readbook() {
   const [pdfjsReady,  setPdfjsReady]  = useState(false)
   const [zoomIdx,     setZoomIdx]     = useState(ZOOM_DEFAULT_IDX)
   const zoomLevel = ZOOM_STEPS[zoomIdx]
+
+  // ── Book selection ────────────────────────────────────────────────────────
+  const [selectedBookId, setSelectedBookId] = useState<string>(BOOKS[0].id)
+  const selectedBook = BOOKS.find(b => b.id === selectedBookId) ?? BOOKS[0]
 
   // Timer state
   const [totalSecs,   setTotalSecs]   = useState(0)
@@ -236,15 +288,46 @@ export default function Readbook() {
     if (mode === 'reading' && readerId) saveProgress()
   }, [currentPage]) // eslint-disable-line
 
-  // Load PDF from public folder
+  // Load the selected book's PDF. Re-runs when the selection changes.
+  // A 5-second fallback prevents the reader from hanging on "Loading book…".
   useEffect(() => {
     if (!pdfjsReady || mode !== 'reading') return
+    const book = BOOKS.find(b => b.id === selectedBookId) ?? BOOKS[0]
+    console.log('[Readbook] Selected book:', book.id, '·', book.title, '→', book.url)
+
+    let cancelled = false
+    let loaded = false
     setPdfErr('')
-    window.pdfjsLib.getDocument({ url: PDF_URL, withCredentials: false })
+    setPdfDoc(null)
+    setTotalPages(0)
+    setCurrentPage(1)
+
+    // Fallback: if the PDF hasn't loaded after 5s, show a helpful error + book list.
+    const fallbackTimer = setTimeout(() => {
+      if (cancelled || loaded) return
+      console.warn('[Readbook] PDF failed to load after 5s:', book.url)
+      setPdfErr('Book not found, try another book')
+    }, 5000)
+
+    window.pdfjsLib.getDocument({ url: book.url, withCredentials: false })
       .promise
-      .then((doc: any) => { setPdfDoc(doc); setTotalPages(doc.numPages); setCurrentPage(1) })
-      .catch((err: any) => { console.error('PDF load error:', err); setPdfErr('Could not open PDF. Please refresh.') })
-  }, [pdfjsReady, mode])
+      .then((doc: any) => {
+        if (cancelled) { try { doc.destroy() } catch { /* */ } return }
+        loaded = true
+        clearTimeout(fallbackTimer)
+        setPdfDoc(doc)
+        setTotalPages(doc.numPages)
+        setCurrentPage(1)
+      })
+      .catch((err: any) => {
+        if (cancelled) return
+        clearTimeout(fallbackTimer)
+        console.error('[Readbook] PDF load error:', err)
+        setPdfErr('Book not found, try another book')
+      })
+
+    return () => { cancelled = true; clearTimeout(fallbackTimer) }
+  }, [pdfjsReady, mode, selectedBookId])
 
   // ── Render page — DPR-aware for crisp text at any zoom ───────────────────
   const renderPage = useCallback(async (pageNum: number, zoom: number) => {
@@ -292,9 +375,16 @@ export default function Readbook() {
     if (!document.fullscreenElement) el.requestFullscreen().catch(() => { /* ignore */ })
     else document.exitFullscreen().catch(() => { /* ignore */ })
   }
-  const handleDownload = () => {
-    const a = document.createElement('a')
-    a.href = PDF_URL; a.download = 'Why-Harm-Your-Body.pdf'; a.click()
+  // Switch book via dropdown: update state + reset the viewer so the load effect
+  // re-fetches the new PDF. Also cancels any in-flight page render.
+  const handleSelectBook = (id: string) => {
+    console.log('[Readbook] Dropdown changed →', id)
+    if (renderTaskRef.current) { try { renderTaskRef.current.cancel() } catch { /* */ } }
+    setPdfDoc(null)
+    setPdfErr('')
+    setTotalPages(0)
+    setCurrentPage(1)
+    setSelectedBookId(id)
   }
 
   // ── Auth handlers ─────────────────────────────────────────────────────────
@@ -429,7 +519,7 @@ export default function Readbook() {
           {/* Book info */}
           <div style={{ flex: '1 1 120px', minWidth: 0 }}>
             <p style={{ color: '#fff', fontWeight: 700, fontSize: '13px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              📖 Why Harm Your Body?
+              📖 {selectedBook.title}
             </p>
             <p style={{ color: '#fbbf24', fontSize: '11px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {readerName} · Pg {currentPage}/{totalPages || '…'} · {progress}% · {fmtTime(totalSecs)} read
@@ -438,6 +528,9 @@ export default function Readbook() {
 
           {/* Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'wrap' }}>
+            <BookSelect value={selectedBookId} onChange={handleSelectBook} />
+            <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.15)', margin: '0 2px' }} aria-hidden="true" />
+
             <ToolBtn onClick={prevPage} disabled={currentPage <= 1} title="Previous page">← Prev</ToolBtn>
             <span style={{ color: '#9ca3af', fontSize: '12px', fontWeight: 700, minWidth: '54px', textAlign: 'center' }}>
               {currentPage}/{totalPages || '…'}
@@ -465,13 +558,6 @@ export default function Readbook() {
 
             <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.15)', margin: '0 2px' }} aria-hidden="true" />
 
-            <ToolBtn onClick={handleDownload} title="Download original PDF">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download
-            </ToolBtn>
-
             <ToolBtn onClick={handleFullscreen} title="Toggle fullscreen">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
@@ -495,8 +581,12 @@ export default function Readbook() {
           alignItems: 'center', padding: '16px',
         }}>
           {pdfErr ? (
-            <div style={{ marginTop: '80px', textAlign: 'center' }}>
-              <p style={{ color: '#f87171', marginBottom: '16px' }}>{pdfErr}</p>
+            <div style={{ marginTop: '80px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <p style={{ color: '#f87171', fontSize: '15px', margin: 0 }}>{pdfErr}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                <label htmlFor="error-book-select" style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700 }}>Choose a book:</label>
+                <BookSelect id="error-book-select" value={selectedBookId} onChange={handleSelectBook} />
+              </div>
               <button onClick={() => window.location.reload()}
                 style={{ background: '#eab308', color: '#000', fontWeight: 700, padding: '8px 24px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>
                 Refresh
@@ -525,8 +615,8 @@ export default function Readbook() {
               </div>
 
               {/* Canvas — CSS size set by renderPage */}
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <canvas ref={canvasRef} style={{ display: 'block', borderRadius: '6px', boxShadow: '0 8px 40px rgba(0,0,0,0.6)', imageRendering: 'auto' }} />
+              <div style={{ position: 'relative', display: 'inline-block' }} onContextMenu={e => e.preventDefault()}>
+                <canvas ref={canvasRef} onContextMenu={e => e.preventDefault()} style={{ display: 'block', borderRadius: '6px', boxShadow: '0 8px 40px rgba(0,0,0,0.6)', imageRendering: 'auto' }} />
                 {renderBusy && (
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', borderRadius: '6px' }}>
                     <svg className="animate-spin" style={{ width: 32, height: 32, color: '#eab308' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
